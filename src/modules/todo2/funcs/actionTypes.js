@@ -1,0 +1,2 @@
+export const TODO_LIST_GET = "TODO2/LIST_GET";
+export const TODO_LIST_GET_SUCCESS = "TODO2/LIST_GET_SUCCESS";
