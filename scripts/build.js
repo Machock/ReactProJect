@@ -14,13 +14,14 @@ process.on('unhandledRejection', err => {
 // Ensure environment variables are read.
 require('../config/env');
 
-
 const path = require('path');
 const chalk = require('react-dev-utils/chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
 const bfj = require('bfj');
-const configFactory = require('../config/webpack.config');
+const configFactory = require("../config/webpack.config");
+const configThirdFactory = require("../config/webpack.config.third");
+const configModuleFactory = require("../config/webpack.config.module");
 const paths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
@@ -49,8 +50,19 @@ const argv = process.argv.slice(2);
 const writeStatsJson = argv.indexOf('--stats') !== -1;
 
 // Generate configuration
-const config = configFactory('production');
-
+const config = getConfig('production');
+function getConfig(env) {
+  const target = process.env.npm_lifecycle_event;
+  if (target === "build") {
+      return configFactory(env);
+  }
+  if (target === "build:module") {
+      return configModuleFactory(env);
+  }
+  if (target === "build:third") {
+      return configThirdFactory(env);
+  }
+}
 // We require that you explicitly set browsers and do not fall back to
 // browserslist defaults.
 const { checkBrowsers } = require('react-dev-utils/browsersHelper');
@@ -63,7 +75,10 @@ checkBrowsers(paths.appPath, isInteractive)
   .then(previousFileSizes => {
     // Remove all content but keep the directory so that
     // if you're in it, you don't end up in Trash
-    fs.emptyDirSync(paths.appBuild);
+
+    // clean folder;
+    // fs.emptyDirSync(paths.appBuild);
+    
     // Merge with the public folder
     copyPublicFolder();
     // Start the webpack build
